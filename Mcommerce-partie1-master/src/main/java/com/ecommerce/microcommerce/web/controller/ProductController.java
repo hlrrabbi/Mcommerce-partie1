@@ -1,6 +1,7 @@
 package com.ecommerce.microcommerce.web.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -57,21 +58,20 @@ public class ProductController {
         return produitsFiltres;
     }
 
-    // Calculer et afficher la marge
+    // Récupérer la liste des produits
     @GetMapping( value = "/AdminProduits" )
-    public Product calculerMargeProduit( Product p, Product cmp ) {
-        p = productDao.calculMarge( p, cmp );
-        int m = 0;
-        for ( int i = 0; i < p.getId(); i++ ) {
-            m = p.getPrix() - p.getPrixAchat();
-            cmp( m );
-        }
-        return calculerMargeProduit( p, cmp );
+    public ResponseEntity<List<String>> calculerMargeProduit() {
+
+        List<String> body = new ArrayList<String>();
+        List<Product> produits = productDao.findAll();
+        produits.stream()
+                .forEach( p -> body.add( p.toString() + ": " + getMargeProduit( p.getPrix(), p.getPrixAchat() ) ) );
+        return ResponseEntity.ok( body );
+
     }
 
-    private void cmp( int m ) {
-        // TODO Auto-generated method stub
-
+    public int getMargeProduit( int prix, int prixAchat ) {
+        return prix - prixAchat;
     }
 
     // Récupérer un produit par son Id
